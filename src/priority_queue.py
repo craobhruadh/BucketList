@@ -10,6 +10,10 @@ class BucketItem:
 
 
 class BucketList:
+    """Implements a bucket list through a priority queue, with some
+    additions - namely it adds reprioritizing and removing items,
+    which are a bit more expensive operations"""
+
     def __init__(self, initial_elems=[]):
         self.queue = []
         self.tasks = set()
@@ -17,32 +21,40 @@ class BucketList:
             self.add(elem)
 
     def add(self, task: str, prioritize: bool = False) -> None:
-        """Add a task.  Prioritize"""
+        """Add a task.  Optionally prioritize it, otherwise we add it to
+        the end of the queue"""
+
+        if not self.queue:
+            self.queue.append(BucketItem(item=task))
+            self.tasks.add(task)
+            return
+
+        if self.queue[0].item == task:
+            return
+
+        if prioritize:
+            priority = self.queue[0].priority - 1
+        else:
+            priority = len(self.queue) + 1
 
         # Handle case where task is already in bucket list
         if task in self.tasks:
-            if prioritize and self.queue[0].item != task:
+            if prioritize:
                 for entry in self.queue:
                     if entry.item == task:
-                        entry.priority = self.queue[0].priority - 1
+                        entry.priority = priority
                         heapq.heapify(self.queue)
                         break
             return
 
-        if prioritize:
-            if not self.queue:
-                entry = BucketItem(item=task)
-            else:
-                entry = BucketItem(item=task, priority=self.queue[0].priority - 1)
-
-        else:
-            entry = BucketItem(item=task, priority=len(self.queue) + 1)
+        entry = BucketItem(item=task, priority=priority)
         heapq.heappush(self.queue, entry)
         self.tasks.add(task)
         heapq.heapify(self.queue)
 
-    def remove(self, task: str) -> None:
-        """Finish a task?  Great job!  Remove it from the queue"""
+    def remove(self, task: str) -> bool:
+        """Finish a task?  Great job!  Remove it from the queue.
+        Returns true if successful, and False if task is not in current bucket list"""
         if task in self.tasks:
             for i in range(len(self.queue)):
                 if self.queue[i].item == task:
@@ -50,7 +62,8 @@ class BucketList:
                     self.queue = self.queue[:-1]
                     heapq.heapify(self.queue)
                     self.tasks.remove(task)
-                    return
+                    return True
+        return False
 
     def get(self) -> str:
         """Get the current highest priority task"""

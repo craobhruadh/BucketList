@@ -51,6 +51,8 @@ def test_remove():
     assert bucket_list.size == 2
     assert bucket_list.get() == "write a book"
 
+    assert not bucket_list.remove("flap arms")
+
 
 def test_prioritize():
     bucket_list = BucketList(
