@@ -54,9 +54,19 @@ def test_remove():
 
 def test_prioritize():
     bucket_list = BucketList(
-        ["travel world", "write a book", "save the world", "put out fire"]
+        ["travel world", "write a book", "save the world", "put out fire", "sleep"]
     )
     bucket_list.prioritize("save the world")
     assert bucket_list.get() == "save the world"
     bucket_list.prioritize("buy a doughnut")
     assert bucket_list.get() == "buy a doughnut"
+
+
+def test_serialization():
+    bucket_list = BucketList(
+        ["travel world", "write a book", "save the world", "put out fire", "sleep"]
+    )
+    bucket_list.to_file("debug.csv")
+    new_bucket_list = BucketList.from_file("debug.csv")
+    assert new_bucket_list.size == 5
+    assert new_bucket_list.get() == "travel world"
