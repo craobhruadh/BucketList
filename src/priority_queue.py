@@ -13,23 +13,45 @@ class BucketList:
     def __init__(self, initial_elems=[]):
         self.queue = []
         self.tasks = {}
-
         for elem in initial_elems:
             self.add(elem)
 
-    def add(self, task: str, priority: int = 1):
-        if task in self.tasks.keys():
-            self.remove(task)
+    def add(self, task: str, prioritize: bool = False) -> None:
+        """Add a task.  Prioritize"""
 
-        entry = BucketItem(task, priority)
+        # Handle case where task is already in bucket list
+        if task in self.tasks.keys():
+            if prioritize and self.queue[0].item != task:
+                for entry in self.queue:
+                    if entry.item == task:
+                        entry.priority = self.queue[0].priority - 1
+                        heapq.heapify(self.queue)
+                        break
+            return
+
+        if prioritize:
+            if not self.queue:
+                entry = BucketItem(item=task)
+            else:
+                entry = BucketItem(item=task, priority=self.queue[0].priority - 1)
+
+        else:
+            entry = BucketItem(item=task, priority=len(self.queue) + 1)
         heapq.heappush(self.queue, entry)
         self.tasks[task] = entry
         heapq.heapify(self.queue)
 
-    def remove(self, task: str):
-        self.tasks.pop(task)
+    def remove(self, task: str) -> None:
+        if task in self.tasks.keys():
+            for i in range(len(self.queue)):
+                if self.queue[i].item == task:
+                    self.queue[i], self.queue[-1] = self.queue[-1], self.queue[i]
+                    self.queue = self.queue[:-1]
+                    heapq.heapify(self.queue)
+                    self.tasks.pop(task)
+                    return
 
-    def get(self):
+    def get(self) -> str:
         """Get the current highest priority task"""
         return self.queue[0].item
 
@@ -40,12 +62,27 @@ class BucketList:
 
     def prioritize(self, task):
         """Have an itch to do something?  Move it
-        to the top of thr queue"""
-        pass  # self.add(task)
+        to the top of the queue"""
+        if task in self.tasks.keys() and self.queue[0].item != task:
+            for entry in self.queue:
+                if entry.item == task:
+                    entry.priority = self.queue[0].priority - 1
+                    heapq.heapify(self.queue)
+                    return
+
+        entry = BucketItem(item=task, priority=self.queue[0].priority - 1)
+        heapq.heappush(self.queue, entry)
 
     @property
-    def n_items(self):
+    def current_task(self) -> str:
+        return self.get()
+
+    @property
+    def size(self) -> int:
         return len(self.queue)
 
-    def print(self):
-        print(self.queue)
+    def print(self, verbose=False):
+        if verbose:
+            print(self.queue)
+        else:
+            print([x.item for x in self.queue])
