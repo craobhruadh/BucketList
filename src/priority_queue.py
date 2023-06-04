@@ -42,6 +42,7 @@ class BucketList:
         heapq.heapify(self.queue)
 
     def remove(self, task: str) -> None:
+        """Finish a task?  Great job!  Remove it from the queue"""
         if task in self.tasks:
             for i in range(len(self.queue)):
                 if self.queue[i].item == task:
@@ -55,12 +56,7 @@ class BucketList:
         """Get the current highest priority task"""
         return self.queue[0].item
 
-    def finish(self, task: str):
-        """Finish a task?  Great job!  Remove it from the queue"""
-        self.remove(task)
-        print(f"You've finished {task}, great job!")
-
-    def prioritize(self, task):
+    def prioritize(self, task: str) -> None:
         """Have an itch to do something?  Move it
         to the top of the queue"""
         if task in self.tasks and self.queue[0].item != task:
@@ -88,12 +84,16 @@ class BucketList:
             print([x.item for x in self.queue])
 
     def to_file(self, filename):
+        """Saves the current object as a .csv file.  Designed to be read
+        by the accompanying static method, `from_file`"""
         with open(filename, "w") as f:
             for entry in self.queue:
                 f.write(f"{entry.item}, {entry.priority}\n")
 
     @staticmethod
     def from_file(filename):
+        """Takes a file, presumably from `to_file`, and returns
+        a new priority queue loaded with this bucket list"""
         with open(filename, "r") as f:
             lines = [x.strip() for x in f.readlines()]
 
