@@ -7,13 +7,12 @@ BUCKET_LIST_FILE = "bucket_list.csv"
 
 parser = ArgumentParser(description="""View and modify bucket list via command line""")
 
-parser.add_argument("-add", action="store")
-parser.add_argument("-remove", action="store")
-parser.add_argument("-prioritize", action="store")
+parser.add_argument("-add", type=str, action="store")
+parser.add_argument("-remove", type=str, action="store")
+parser.add_argument("-prioritize", type=str, action="store")
 parser.add_argument("-get", action="store_true")
 parser.add_argument("-list", action="store_true")
 
-# parser.add_argument('item')
 args = parser.parse_args()
 if BUCKET_LIST_FILE in os.listdir("./"):
     bucket_list = BucketList.from_file(BUCKET_LIST_FILE)
@@ -31,6 +30,3 @@ if args.get:
 if args.list:
     bucket_list.print(verbose=True)
 bucket_list.to_file(BUCKET_LIST_FILE)
-# if command in {'list', 'add'}
-
-# add, prioritize, remove
