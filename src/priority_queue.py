@@ -92,7 +92,11 @@ class BucketList:
 
     def print(self, verbose=False):
         if verbose:
-            print(self.queue)
+            for i, elem in enumerate(self.queue):
+                if i == 0:
+                    print(f"*** {elem.item}: {elem.priority}")
+                else:
+                    print(f"{elem.item}: {elem.priority}")
         else:
             print([x.item for x in self.queue])
 
